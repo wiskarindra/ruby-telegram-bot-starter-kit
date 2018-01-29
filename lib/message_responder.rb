@@ -93,7 +93,7 @@ class MessageResponder
       #jenkins.post
       job = Job.where(staging: @staging_server).last
       message = "Finished: SUCCESS" unless job.present?
-      message |= @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
+      message ||= @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
       if message == "Finished: SUCCESS" || message == "Finished: FAILURE" || message == "Finished: ABORTED"
         opts = {'build_start_timeout' => 30, 'cancel_on_build_start_timeout' => true}
         @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
