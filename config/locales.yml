@@ -1,3 +1,10 @@
 en:
   greeting_message: "Hi! Telegram is awesome!"
+  help_message: "Help"
   farewell_message: "Bye! I'll miss you :("
+  deploy_message: "@%{username} lagi deploy branch %{branch} ke http://www.%{staging}.vm"
+  backburner:restart_message: "@%{username} lagi restart bb branch %{branch} ke http://www.%{staging}.vm"
+  backburner:start_message: "@%{username} lagi start bb branch %{branch} ke http://www.%{staging}.vm"
+  backburner:stop_message: "@%{username} lagi stop bb branch %{branch} ke http://www.%{staging}.vm"
+  lock:release_message: "@%{username} lagi lock release branch %{branch} ke http://www.%{staging}.vm"
+  fail_message: "@%{username}, ada kesalahan woi"
