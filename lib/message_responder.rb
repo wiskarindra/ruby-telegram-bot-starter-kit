@@ -45,7 +45,7 @@ class MessageResponder
         answer_with_parameters("lock:release")
       end
     else
-      answer_with_message I18n.t('user_not_registered', username: message.chat.username)
+      answer_with_message I18n.t('user_not_registered', username: message.chat.username, chat_id: message.from.id)
     end
   end
 

@@ -8,4 +8,4 @@ en:
   backburner:stop_message: "@%{username} lagi stop bb branch %{branch} ke http://www.%{staging}.vm"
   lock:release_message: "@%{username} lagi lock release branch %{branch} ke http://www.%{staging}.vm"
   fail_message: "ada kesalahan woi @%{username}!, gw pukul juga neh lama2"
-  user_not_registered: "username @%{username} belum terdaftar, silahkan tambahkan sendiri, atau kasih highfive 10 ke @wiskarindra biar bisa lansung didaftarkan"
+  user_not_registered: "username @%{username} dengan id %{chat_id} belum terdaftar, silahkan tambahkan sendiri, atau kasih highfive 10 ke @wiskarindra biar bisa lansung didaftarkan"
