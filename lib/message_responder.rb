@@ -45,8 +45,7 @@ class MessageResponder
         answer_with_parameters("lock:release")
       end
     else
-      logger.debug "message.from.id @message.chat.username tidak terdaftar"
-      answer_with_message I18n.t('fail_message', username: message.chat.username)
+      answer_with_message I18n.t('user_not_registered', username: message.chat.username)
     end
   end
 
