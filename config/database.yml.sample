@@ -1,5 +1,9 @@
-adapter: postgresql
-database: telegrambotboilerplate
-encoding: unicode
+adapter: mysql2
+database: gisela_bot
+encoding: utf8
+password: strong_mysql_password
 pool: 5
 timeout: 5000
+username: root
+host: 127.0.0.1
+port: 3306
