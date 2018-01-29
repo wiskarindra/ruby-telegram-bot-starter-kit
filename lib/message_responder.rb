@@ -3,6 +3,7 @@ require './models/job'
 require './lib/message_sender'
 require './lib/jenkins_access'
 require 'jenkins_api_client'
+require 'pry'
 
 class MessageResponder
   attr_reader :message
@@ -16,36 +17,32 @@ class MessageResponder
   end
 
   def respond
-    if @user.present?
-      on /^\/start/ do
-        answer_with_greeting_message
-      end
+    on /^\/start/ do
+      answer_with_greeting_message
+    end
 
-      on /^\/help/ do
-        answer_with_help_message
-      end
+    on /^\/help/ do
+      answer_with_help_message
+    end
 
-      on /^\/deploy/ do
-        answer_with_parameters('deploy')
-      end
+    on /^\/deploy/ do
+      answer_with_parameters('deploy')
+    end
 
-      on /^\/bb_restart/ do
-        answer_with_parameters("backburner:restart")
-      end
+    on /^\/bb_restart/ do
+      answer_with_parameters("backburner:restart")
+    end
 
-      on /^\/bb_start/ do
-        answer_with_parameters("backburner:start")
-      end
+    on /^\/bb_start/ do
+      answer_with_parameters("backburner:start")
+    end
 
-      on /^\/bb_stop/ do
-        answer_with_parameters("backburner:stop")
-      end
+    on /^\/bb_stop/ do
+      answer_with_parameters("backburner:stop")
+    end
 
-      on /^\/lock_release/ do
-        answer_with_parameters("lock:release")
-      end
-    else
-      answer_with_message I18n.t('user_not_registered', username: message.chat.username, chat_id: message.from.id)
+    on /^\/lock_release/ do
+      answer_with_parameters("lock:release")
     end
   end
 
@@ -66,19 +63,31 @@ class MessageResponder
   end
 
   def answer_with_greeting_message
-    answer_with_message I18n.t('greeting_message')
+    if @user.present?
+      answer_with_message I18n.t('greeting_message')
+    else
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+    end
   end
 
   def answer_with_help_message
-    answer_with_message I18n.t('help_message')
+    if @user.present?
+      answer_with_message I18n.t('help_message')
+    else
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+    end
   end
 
   def answer_with_parameters(action)
-    res = jenkins_access(action)
-    if res
-      answer_with_message I18n.t("#{action}_message", username: message.chat.username, branch: @branch, staging: @staging_server)
+    if @user.present?
+      res = jenkins_access(action)
+      if res
+        answer_with_message I18n.t("#{action}_message", username: message.from.username, branch: @branch, staging: @staging_server)
+      else
+        answer_with_message I18n.t('fail_message', username: message.from.username)
+      end
     else
-      answer_with_message I18n.t('fail_message', username: message.chat.username)
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
     end
   end
 
