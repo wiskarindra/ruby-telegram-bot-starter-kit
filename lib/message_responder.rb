@@ -91,12 +91,12 @@ class MessageResponder
     if ['staging12.vm', 'staging46.vm', 'staging49.vm', 'staging77.vm'].include? @staging_server
       #jenkins = JenkinsAccess.new(branch: @branch, staging_server: @staging_server, action: action, migrate: @migrate, reindex: @reindex, normalize: @normalize)
       #jenkins.post
+      @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
       job = Job.where(staging: @staging_server).last
       message = "Finished: SUCCESS" unless job.present?
       message ||= @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
       if message == "Finished: SUCCESS" || message == "Finished: FAILURE" || message == "Finished: ABORTED"
         opts = {'build_start_timeout' => 30, 'cancel_on_build_start_timeout' => true}
-        @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
         build = @client.job.build("Staging Deployment", { staging_server: @staging_server, staging_user: "bukalapak", staging_branch: @branch, staging_action: action, migrate: @migrate, reindex: @reindex, normalize_date: @normalize }, opts)
         Job.create(user_id: @user.id, job_id: build.to_i, staging: @staging_server)
         true
