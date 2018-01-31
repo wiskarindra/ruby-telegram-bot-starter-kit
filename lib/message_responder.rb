@@ -3,6 +3,7 @@ require './models/job'
 require './lib/message_sender'
 require './lib/jenkins_access'
 require 'jenkins_api_client'
+require './lib/app_configurator'
 require 'pry'
 
 class MessageResponder
@@ -114,14 +115,15 @@ class MessageResponder
         opts = {'build_start_timeout' => 30, 'cancel_on_build_start_timeout' => true}
         build = @client.job.build("Staging Deployment", { staging_server: @staging_server, staging_user: "bukalapak", staging_branch: @branch, staging_action: action, migrate: @migrate, reindex: @reindex, normalize_date: @normalize }, opts)
         Job.create(user_id: @user.id, job_id: build.to_i, staging: @staging_server)
-        [0, job.job_id]
+        [0, build.to_i]
       else
         [1, job.job_id]
       end
     else
       [2, nil]
     end
-  rescue
+  rescue => e
+    logger.debug e
     [3, nil]
   end
 
@@ -136,5 +138,9 @@ class MessageResponder
 
   def config
     YAML::load(IO.read('config/secrets.yml'))
+  end
+
+  def logger
+    AppConfigurator.new.get_logger
   end
 end
