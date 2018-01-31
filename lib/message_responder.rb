@@ -80,9 +80,15 @@ class MessageResponder
 
   def answer_with_parameters(action)
     if @user.present?
-      res = jenkins_access(action)
-      if res
-        answer_with_message I18n.t("#{action}_message", username: message.from.username, branch: @branch, staging: @staging_server)
+      res= jenkins_access(action)
+      if res[0] == 0
+        job_id = res[1]
+        answer_with_message I18n.t("#{action}_message", username: message.from.username, branch: @branch, staging: @staging_server, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+      elsif res[0] == 1
+        job_id = res[1]
+        answer_with_message I18n.t('fail_message_jenkins', username: message.from.username, staging: @staging_server, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+      elsif res[0] == 2
+        answer_with_message I18n.t('fail_message_staging', username: message.from.username)
       else
         answer_with_message I18n.t('fail_message', username: message.from.username)
       end
@@ -108,24 +114,24 @@ class MessageResponder
         opts = {'build_start_timeout' => 30, 'cancel_on_build_start_timeout' => true}
         build = @client.job.build("Staging Deployment", { staging_server: @staging_server, staging_user: "bukalapak", staging_branch: @branch, staging_action: action, migrate: @migrate, reindex: @reindex, normalize_date: @normalize }, opts)
         Job.create(user_id: @user.id, job_id: build.to_i, staging: @staging_server)
-        true
+        [0, job.job_id]
       else
-        false
+        [1, job.job_id]
       end
     else
-      false
+      [2, nil]
     end
   rescue
-    false
+    [3, nil]
   end
 
   def set_jenkins_params
     split = message.text.split(' ')
     @branch = split[1]
     @staging_server = split[2].to_s+'.vm'
-    @migrate = split[3]
-    @reindex = split[4]
-    @normalize = split[5]
+    @migrate = split[3].to_s == 'm' ? true : false
+    @reindex = split[3].to_s == 'r' ? true : split[4].to_s == 'r' ? true : false
+    @normalize = split[3].to_s == 'n' ? true : split[4].to_s == 'n' ? true : split[5].to_s == 'n' ? true : false
   end
 
   def config

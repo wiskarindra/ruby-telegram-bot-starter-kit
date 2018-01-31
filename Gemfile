@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'telegram-bot-ruby'
+gem 'telegram-bot-ruby', :git => 'git@github.com:atipugin/telegram-bot-ruby.git'
 gem 'activerecord'
 gem 'i18n'
 gem 'rake'
