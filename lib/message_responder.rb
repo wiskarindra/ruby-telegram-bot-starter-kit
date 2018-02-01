@@ -115,7 +115,7 @@ class MessageResponder
       message = "Finished: SUCCESS" unless job.present?
       message ||= @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
       if message == "Finished: SUCCESS" || message == "Finished: FAILURE" || message == "Finished: ABORTED"
-        opts = {'build_start_timeout' => 30, 'cancel_on_build_start_timeout' => true}
+        opts = {'build_start_timeout' => 60, 'cancel_on_build_start_timeout' => true}
         build = @client.job.build("Staging Deployment", { staging_server: @staging_server, staging_user: "bukalapak", staging_branch: @branch, staging_action: action, migrate: @migrate, reindex: @reindex, normalize_date: @normalize }, opts)
         Job.create(user_id: @user.id, job_id: build.to_i, staging: @staging_server)
         [0, build.to_i]
