@@ -12,3 +12,8 @@ en:
   fail_message_jenkins: "Mohon maaf wahai yang mulia @%{username}!, dengan berat hati gw sampaikan bahwa job yang lo jalanin sebelumnya ke <b>%{staging}</b> masih berjalan. %{jenkins_job_url}"
   fail_message_staging: "Mohon maaf wahai yang mulia @%{username}! yang gw hormati sepenuh hati, gw hanya melayani <b>staging12</b>, <b>staging46</b>, <b>staging49</b>, dan <b>staging77</b>"
   user_not_registered: "Username @%{username} dengan id %{chat_id} belum terdaftar, silahkan tambahkan sendiri, atau kasih highfive 10 ke @wiskarindra biar bisa lansung didaftarkan"
+  status_message_finished: "Lapor yang mulia  @%{username}!, statusnya sekarang adalah <b>%{status}</b>. %{jenkins_job_url}"
+  status_message_running: "Lapor yang mulia  @%{username}!, sepertinya job yang lo jalanin sebelumnya masih running. %{jenkins_job_url}"
+  status_message_job_not_found: "Lapor yang mulia  @%{username}!, sepertinya tidak ada job yang jalan di %{staging} atau ada yang deploy manual ke jenkins"
+  stop_message_finished: "Lapor yang mulia  @%{username}!, pembatalan job berhasil. %{jenkins_job_url}"
+  stop_message_failed: "Lapor yang mulia  @%{username}!, pembatalan job gagal. %{jenkins_job_url}"

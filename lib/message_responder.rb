@@ -45,6 +45,14 @@ class MessageResponder
     on /^\/lock_release/ do
       answer_with_parameters("lock:release")
     end
+
+    on /^\/status/ do
+      answer_with_status_message
+    end
+
+    on /^\/stop/ do
+      answer_with_stop_message
+    end
   end
 
   private
@@ -74,6 +82,55 @@ class MessageResponder
   def answer_with_help_message
     if @user.present?
       answer_with_message I18n.t('help_message')
+    else
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+    end
+  end
+
+  def answer_with_status_message
+    if @user.present?
+      set_status_params
+      if ['staging12.vm', 'staging46.vm', 'staging49.vm', 'staging77.vm'].include? @staging_server
+        @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
+        job = Job.where(staging: @staging_server).last
+        if job.present?
+          message = @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
+          if message == "Finished: SUCCESS" || message == "Finished: FAILURE" || message == "Finished: ABORTED"
+            answer_with_message I18n.t('status_message_finished', username: message.from.username, status: message, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+          else
+            answer_with_message I18n.t('status_message_running', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+          end
+        else
+          answer_with_message I18n.t('status_message_job_not_found', username: message.from.username)
+        end
+      else
+        answer_with_message I18n.t('fail_message_staging', username: message.from.username, staging: @staging_server)
+      end
+    else
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+    end
+  end
+
+  def answer_with_stop_message
+    if @user.present?
+      set_status_params
+      if ['staging12.vm', 'staging46.vm', 'staging49.vm', 'staging77.vm'].include? @staging_server
+        @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
+        job = Job.where(staging: @staging_server).last
+        if job.present?
+          begin
+            @client.job.stop_build("Staging Deployment", job.job_id)
+            answer_with_message I18n.t('stop_message_finished', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+          rescue => e
+            logger.debug e
+            answer_with_message I18n.t('stop_message_failed', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+          end
+        else
+          answer_with_message I18n.t('status_message_job_not_found', username: message.from.username)
+        end
+      else
+        answer_with_message I18n.t('fail_message_staging', username: message.from.username, staging: @staging_server)
+      end
     else
       answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
     end
@@ -140,6 +197,10 @@ class MessageResponder
     @migrate = split[3].to_s == 'm' ? true : false
     @reindex = split[3].to_s == 'r' ? true : split[4].to_s == 'r' ? true : false
     @normalize = split[3].to_s == 'n' ? true : split[4].to_s == 'n' ? true : split[5].to_s == 'n' ? true : false
+  end
+
+  def set_status_params
+    @staging_server = split[1].to_s+'.vm'
   end
 
   def config
