@@ -94,7 +94,7 @@ class MessageResponder
         @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
         job = Job.where(staging: @staging_server).last
         if job.present?
-          status = @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
+          status = get_job_status(job)
           if status == "Finished: SUCCESS" || status == "Finished: FAILURE" || status == "Finished: ABORTED"
             answer_with_message I18n.t('status_message_finished', username: message.from.username, status: status, jenkins_job_url: config["jenkins_job_url"]+job.job_id.to_s)
           else
@@ -153,11 +153,11 @@ class MessageResponder
       elsif res[0] == 3
         answer_with_message I18n.t('fail_message_time_out', username: message.from.username)
       else
-        answer_with_message I18n.t('fail_message', username: message.from.username)
+        answer_with_message res[1]
+        #answer_with_message I18n.t('fail_message', username: message.from.username)
       end
     else
-      answer_with_message res[1]
-      #answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
     end
   end
 
@@ -173,7 +173,7 @@ class MessageResponder
       @client = JenkinsApi::Client.new(server_url: config["jenkins_url"], username: config["jenkins_username"], password: config["jenkins_api_token"])
       job = Job.where(staging: @staging_server).last
       status = "Finished: SUCCESS" unless job.present?
-      status ||= @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
+      status ||= get_job_status(job)
       if status == "Finished: SUCCESS" || status == "Finished: FAILURE" || status == "Finished: ABORTED"
         opts = {'build_start_timeout' => 60, 'cancel_on_build_start_timeout' => true}
         build = @client.job.build("Staging Deployment", { staging_server: @staging_server, staging_user: "bukalapak", staging_branch: @branch, staging_action: action, migrate: @migrate, reindex: @reindex, normalize_date: @normalize }, opts)
@@ -205,6 +205,13 @@ class MessageResponder
   def set_status_params
     split = message.text.split(' ')
     @staging_server = split[1].to_s+'.vm'
+  end
+
+  def get_job_status(job)
+    @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
+  rescue => e
+    logger.debug e
+    "Finished: SUCCESS"
   end
 
   def config
