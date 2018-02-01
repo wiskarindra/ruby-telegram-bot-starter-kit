@@ -96,9 +96,9 @@ class MessageResponder
         if job.present?
           message = @client.job.get_console_output("Staging Deployment", job.job_id)["output"].split("\r\n").last
           if message == "Finished: SUCCESS" || message == "Finished: FAILURE" || message == "Finished: ABORTED"
-            answer_with_message I18n.t('status_message_finished', username: message.from.username, status: message, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+            answer_with_message I18n.t('status_message_finished', username: message.from.username, status: message, jenkins_job_url: config["jenkins_job_url"]+job.job_id.to_s)
           else
-            answer_with_message I18n.t('status_message_running', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+            answer_with_message I18n.t('status_message_running', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job.job_id.to_s)
           end
         else
           answer_with_message I18n.t('status_message_job_not_found', username: message.from.username)
@@ -123,10 +123,10 @@ class MessageResponder
         if job.present?
           begin
             @client.job.stop_build("Staging Deployment", job.job_id)
-            answer_with_message I18n.t('stop_message_finished', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+            answer_with_message I18n.t('stop_message_finished', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job.job_id.to_s)
           rescue => e
             logger.debug e
-            answer_with_message I18n.t('stop_message_failed', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
+            answer_with_message I18n.t('stop_message_failed', username: message.from.username, jenkins_job_url: config["jenkins_job_url"]+job.job_id.to_s)
           end
         else
           answer_with_message I18n.t('status_message_job_not_found', username: message.from.username)
