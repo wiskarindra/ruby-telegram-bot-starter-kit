@@ -109,6 +109,9 @@ class MessageResponder
     else
       answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
     end
+  rescue => e
+    logger.debug e
+    answer_with_message e.message
   end
 
   def answer_with_stop_message
