@@ -8,6 +8,7 @@ en:
   backburner:stop_message: "@%{username} lagi <b>stop backburner</b> branch <b>%{branch}</b> ke http://www.%{staging}. %{jenkins_job_url}"
   lock:release_message: "Yang mulia @%{username} lagi <b>lock release</b> branch <b>%{branch}</b> ke http://www.%{staging}. %{jenkins_job_url}"
   fail_message: "Tetap tenang dan semangat wahai yang mulia @%{username}!, botnya lagi sakit"
+  fail_message_time_out: "Mohon maaf wahai yang mulia @%{username}!, dengan berat hati gw sampaikan bahwa terjadi connection timeout ke jenkins"
   fail_message_jenkins: "Mohon maaf wahai yang mulia @%{username}!, dengan berat hati gw sampaikan bahwa job yang lo jalanin sebelumnya ke <b>%{staging}</b> masih berjalan. %{jenkins_job_url}"
   fail_message_staging: "Mohon maaf wahai yang mulia @%{username}! yang gw hormati sepenuh hati, gw hanya melayani <b>staging12</b>, <b>staging46</b>, <b>staging49</b>, dan <b>staging77</b>"
   user_not_registered: "Username @%{username} dengan id %{chat_id} belum terdaftar, silahkan tambahkan sendiri, atau kasih highfive 10 ke @wiskarindra biar bisa lansung didaftarkan"

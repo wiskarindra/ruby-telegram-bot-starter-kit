@@ -90,11 +90,14 @@ class MessageResponder
         answer_with_message I18n.t('fail_message_jenkins', username: message.from.username, staging: @staging_server, jenkins_job_url: config["jenkins_job_url"]+job_id.to_s)
       elsif res[0] == 2
         answer_with_message I18n.t('fail_message_staging', username: message.from.username)
+      elsif res[0] == 3
+        answer_with_message I18n.t('fail_message_time_out', username: message.from.username)
       else
         answer_with_message I18n.t('fail_message', username: message.from.username)
       end
     else
-      answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
+      answer_with_message res[1]
+      #answer_with_message I18n.t('user_not_registered', username: message.from.username, chat_id: message.from.id)
     end
   end
 
@@ -122,9 +125,12 @@ class MessageResponder
     else
       [2, nil]
     end
-  rescue => e
+  rescue Timeout::Error => e
     logger.debug e
     [3, nil]
+  rescue => e
+    logger.debug e
+    [4, e.message]
   end
 
   def set_jenkins_params
