@@ -200,6 +200,7 @@ class MessageResponder
   end
 
   def set_status_params
+    split = message.text.split(' ')
     @staging_server = split[1].to_s+'.vm'
   end
 
